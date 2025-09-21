@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Find a Water Heater</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.6.1/nouislider.min.css" />
+  <style>
+body { margin: 0; font-family: Arial, sans-serif; background: #f4efe6; overflow-x: auto; }
+    .wrapper { max-width: calc(100% - 4px); margin: 0 auto; padding: 0 2px; min-width: fit-content; }
+    h1 { margin-bottom: 6px; text-align: center; }
+    .headline-box { display: inline-block; padding: 6px 12px; border: 2px solid #ccc; border-radius: 4px; background: transparent; color: #333; }
+    .subtitle { font-size: 0.9em; color: #cccccc; text-align: center; margin-bottom: 20px; }
+    .button-container { text-align: center; margin-bottom: 20px; }
+    .filter-btn { padding: 6px 12px; font-size: 0.9em; border: 2px solid #ccc; border-radius: 4px; background: transparent; color: #ccc; cursor: pointer; margin: 0 4px; }
+    .filter-btn.active { border-color: black; color: black; }
+    .filter-btn:hover { background-color: #f1f1f1; }
+    .clear-btn { padding: 6px 12px; font-size: 0.9em; border: 2px solid #ccc; border-radius: 4px; background: transparent; color: #ccc; cursor: pointer; margin: 0 4px; transition: all 0.2s ease; }
+    .clear-btn:hover { background-color: #f1f1f1; }
+    .clear-btn.active { border-color: #ff6b6b; background: #ff6b6b; color: white; }
+    .clear-btn.active:hover { background-color: transparent; border-color: black; color: black; }
+    .slider-wrapper { display: none; text-align: center; margin-bottom: 20px; }
+    .slider { margin: 20px auto; width: 100px; }
+    .slider-value { margin-top: 6px; font-size: 0.9em; color: #333; text-align: center; }
+    .hybrid-toggle-container, .manufacturer-checkboxes { display: flex; gap: 6px; margin-top: 4px; justify-content: center; flex-wrap: wrap; padding: 0 5px;}
+    .hybrid-toggle { padding: 4px 10px; font-size: 0.9em; border: 2px solid #ccc; border-radius: 4px; background: #f4efe6; color: #ccc; cursor: pointer; transition: all 0.2s ease; margin: 0; }
+    .hybrid-toggle:hover { background-color: #f1f1f1; }
+    .hybrid-toggle.active { border-color: black; color: black; background: #f4efe6; }
+    .manufacturer-checkboxes { display: inline-flex; gap: 4px; margin-top: 4px; }
+    .manufacturer-toggle { padding: 4px 10px; font-size: 0.9em; border: 2px solid #ccc; border-radius: 4px; background: #f4efe6; color: #ccc; cursor: pointer; transition: all 0.2s ease; margin: 0; }
+    .manufacturer-toggle:hover { background-color: #f1f1f1; }
+    .manufacturer-toggle.active { border-color: black; color: black; background: #f4efe6; }
+    .noUi-target { background: transparent; border: none; box-shadow: none; margin-top: 12px; }
+    .noUi-horizontal { height: 1px; background: black; }
+    .noUi-connect { background: black; }
+    .noUi-handle { width: 12px !important; height: 12px !important; border-radius: 50% !important; background: black !important; border: none !important; box-shadow: none !important; position: absolute !important; top: 50% !important; transform: translate(-85%, -50%) !important; cursor: pointer; }
+    .noUi-handle:hover { background-color: #222; }
+    .noUi-handle::before, .noUi-handle::after { display: none !important; }
+    #productTable { margin: 20px auto; border-collapse: collapse; }
+    #productTable th { cursor: pointer; position: sticky; top: 0; background: #f4efe6; z-index: 5; }
+    th, td { padding: 8px 10px; border-bottom: 1px solid #ccc; text-align: center; white-space: nowrap; font-size: 0.9em; }
+    #productTable tbody tr { transition: background-color 0.2s ease; cursor: pointer; }
+    #productTable tbody tr:hover:not(.selected) { background-color: #FFD32C; }
+    #productTable tbody tr.selected { background-color: #FFD32C !important; }
+    .unit-tooltip { position: relative; cursor: help; }
+    .unit-tooltip::after { content: attr(data-unit); position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.8em; font-weight: normal; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity 0.2s; z-index: 10; }
+    .unit-tooltip:hover::after { opacity: 1; }
+    .left-align { text-align: left; }
+    .numeric-cell { text-align: center; }
+    .unavailable-cell { font-size: 0.7em; color: #999; }
+    .sort-indicator { margin-left: 6px; font-size: 0.8em; color: #666; display: inline-block; transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55); transform-origin: center; }
+    .sort-indicator.flip-in { animation: flipIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55); }
+    @keyframes flipIn { 0% { transform: rotateY(90deg) scale(0.8); opacity: 0; } 50% { transform: rotateY(45deg) scale(1.1); opacity: 0.7; } 100% { transform: rotateY(0deg) scale(1); opacity: 1; } }
+    .no-results { text-align: center; padding: 40px 20px; color: #666; font-style: italic; }
+    a { color: #3F00FF; text-decoration: none; }
+    a:hover { color: #ff006a; }
+    .model-link { color: inherit; text-decoration: none; border-bottom: 1px dotted #999; transition: border-bottom-color 0.2s ease; }
+    .model-link:hover { border-bottom-color: #333; }
+    footer.page-footer { margin-top: 40px; margin-bottom: 40px; text-align: center; font-size: 0.9em; color: #888; }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <h1>Find a <span class="headline-box">Water Heater</span></h1>
+    <div class="subtitle" id="resultCount"> </div>
+    <div class="button-container">
+      <button id="manufacturerBtn" class="filter-btn">Manufacturer</button>
+      <button id="capacityBtn" class="filter-btn">Capacity</button>
+      <button id="uefBtn" class="filter-btn">Efficiency</button>
+      <button id="hybridBtn" class="filter-btn">Hybrid</button>
+      <button id="powerBtn" class="filter-btn">Power</button>
+      <button id="priceBtn" class="filter-btn">Price</button>
+      <button id="clearBtn" class="clear-btn">Clear</button>
+    </div>
+    <div id="manufacturerFilterWrapper" class="slider-wrapper">
+      <div id="manufacturerCheckboxes" class="manufacturer-checkboxes"></div>
+    </div>
+    <div id="sliderWrapper" class="slider-wrapper">
+      <div id="rangeSlider" class="slider"></div>
+      <div id="sliderValue" class="slider-value">Loading...</div>
+    </div>
+    <div id="uefSliderWrapper" class="slider-wrapper">
+      <div id="uefSlider" class="slider"></div>
+      <div id="uefSliderValue" class="slider-value">Loading...</div>
+    </div>
+    <div id="priceSliderWrapper" class="slider-wrapper">
+      <div id="priceSlider" class="slider"></div>
+      <div id="priceSliderValue" class="slider-value">Loading...</div>
+    </div>
+    <div id="hybridFilterWrapper" class="slider-wrapper">
+      <div class="hybrid-toggle-container">
+        <button id="hybridYesBtn" class="hybrid-toggle">Yes</button>
+        <button id="hybridNoBtn" class="hybrid-toggle">No</button>
+        <button id="hybridBothBtn" class="hybrid-toggle active">Both</button>
+      </div>
+    </div>
+    <div id="powerFilterWrapper" class="slider-wrapper">
+      <div class="hybrid-toggle-container">
+        <button id="powerPluginBtn" class="hybrid-toggle">Plug-in</button>
+        <button id="powerHardwiredBtn" class="hybrid-toggle">Hardwired</button>
+        <button id="powerBothBtn" class="hybrid-toggle active">Both</button>
+      </div>
+    </div>
+    <table id="productTable">
+      <thead></thead>
+      <tbody></tbody>
+    </table>
+    <footer class="page-footer">All products are Energy Star rated unless noted. Contact © 2025</footer>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.6.1/nouislider.min.js"></script>
+  <script>
+    const apiUrl = 'https://sheets.googleapis.com/v4/spreadsheets/10yQR_O9494E879LH_pULoeG2jA30oVF_1bMSBEA7cXQ/values/HPWH%20Comparison?key=AIzaSyD0oPQekstpu0zmW_WL6eITKoxL_MTbH58';
+    let products = [], filteredProducts = [], selectedProducts = new Set(), currentSort = { column: null, direction: 'asc' };
+    const columnsToHide = ['Manufacturer','Weight (LB)', 'Nominal Capacity (GAL)', 'COST', 'Vol (CF)','Energy Star','Spec'];
+    let capacityRange = [0, 110], uefRange = [0.0, 3.5], priceRange = [0, 10000], hybridFilter = 'both', powerFilter = 'both';
+    let actualCapacityRange = [0, 110], actualUefRange = [0.0, 3.5], actualPriceRange = [0, 10000];
+    let detectedNumericColumns = new Set();
+    let selectedManufacturers = new Set(), allManufacturers = [], excludedManufacturers = new Set();
+
+    const filters = {
+      manufacturer: { btn: 'manufacturerBtn', wrapper: 'manufacturerFilterWrapper' },
+      capacity: { btn: 'capacityBtn', wrapper: 'sliderWrapper', range: () => capacityRange, actual: () => actualCapacityRange },
+      uef: { btn: 'uefBtn', wrapper: 'uefSliderWrapper', range: () => uefRange, actual: () => actualUefRange },
+      hybrid: { btn: 'hybridBtn', wrapper: 'hybridFilterWrapper' },
+      power: { btn: 'powerBtn', wrapper: 'powerFilterWrapper' },
+      price: { btn: 'priceBtn', wrapper: 'priceSliderWrapper', range: () => priceRange, actual: () => actualPriceRange }
+    };
+
+    const textColumns = ['Make', 'Model', 'SPEC', 'COST', 'Hybrid'];
+    
+    function isProductAvailable(product) {
+  const priceValue = product['Price'];
+  if (!priceValue) return true; // If no price value, assume available
+  
+  const priceLower = priceValue.toLowerCase().trim();
+  const isUnavailable = priceLower.includes('not yet available') || 
+                       priceLower.includes('discontinued') ||
+                       priceLower === 'not yet available' ||
+                       priceLower === 'discontinued';
+  
+  return !isUnavailable;
+}
+    
+    function detectNumericColumn(columnKey, data) {
+      if (detectedNumericColumns.has(columnKey) || textColumns.includes(columnKey)) return textColumns.includes(columnKey) ? false : true;
+      const sampleSize = Math.min(10, data.length);
+      let numericCount = 0;
+      for (let i = 0; i < sampleSize; i++) {
+        const value = data[i][columnKey];
+        if (!value || value.trim() === '' || value.toLowerCase().includes('unavailable')) continue;
+        const numericValue = extractNumericValue(value, columnKey);
+        if (!isNaN(numericValue) && isFinite(numericValue)) numericCount++;
+      }
+      const nonEmptyCount = data.slice(0, sampleSize).filter(item => {
+        const val = item[columnKey];
+        return val && val.trim() !== '' && !val.toLowerCase().includes('unavailable');
+      }).length;
+      const isNumeric = nonEmptyCount > 0 && (numericCount / nonEmptyCount) > 0.6;
+      if (isNumeric) detectedNumericColumns.add(columnKey);
+      return isNumeric;
+    }
+
+    function extractNumericValue(value, columnKey) {
+      if (!value || typeof value !== 'string') return NaN;
+      if (value.toLowerCase().includes('unavailable') || value.trim() === '') return NaN;
+      let cleaned = value.replace(/[\$,\s]/g, '');
+      const unitRemovals = {
+        'Height': /['"in]/gi, 'Diameter': /['"in]/gi, 'Weight (LB)': /lb/gi,
+        'Noise': /db/gi, 'First Hour Rating': /gal|gallons?|gph|hr/gi
+      };
+      if (unitRemovals[columnKey] || columnKey.toLowerCase().includes('rating')) {
+        cleaned = cleaned.replace(unitRemovals[columnKey] || /gal|gallons?|gph|hr/gi, '');
+      }
+      if (cleaned.includes('-') || cleaned.includes('–')) cleaned = cleaned.split(/[-–]/)[0];
+      const num = parseFloat(cleaned);
+      return isNaN(num) ? NaN : num;
+    }
+
+    function getRange(data, key) {
+      const values = data.map(p => parseFloat(p[key]?.replace(/[^\d.]/g, ''))).filter(v => isFinite(v));
+      return values.length ? [Math.min(...values), Math.max(...values)] : [0, key === 'Price' ? 10000 : 100];
+    }
+
+    function getPriceRange(data) {
+      const values = [];
+      for (let p of data) {
+        const priceStr = p['Price'];
+        if (priceStr && priceStr.toLowerCase() !== 'unavailable' && priceStr.trim() !== '') {
+          const cleaned = priceStr.replace(/\$|,/g, '');
+          const num = parseFloat(cleaned);
+          if (!isNaN(num) && isFinite(num)) values.push(num);
+        }
+      }
+      return values.length > 0 ? [Math.min(...values), Math.max(...values)] : [0, 10000];
+    }
+
+function parseSheetData(data) {
+  const [header, ...rows] = data.values;
+  const allProducts = rows.map((row, index) => {
+    const obj = { _id: `product_${index}` };
+    header.forEach((key, i) => obj[key] = row[i] || '');
+    return obj;
+  });
+  
+  // Filter out unavailable products
+  return allProducts.filter(product => isProductAvailable(product));
+}
+
+    function toggleFilter(filterName) {
+      Object.keys(filters).forEach(f => {
+        if (f !== filterName) document.getElementById(filters[f].wrapper).style.display = 'none';
+      });
+      const wrapper = document.getElementById(filters[filterName].wrapper);
+      wrapper.style.display = wrapper.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function clearAllFilters() {
+      // Reset all ranges to actual ranges
+      capacityRange = [...actualCapacityRange];
+      uefRange = [...actualUefRange];
+      priceRange = [...actualPriceRange];
+      
+      // Reset filter states
+      hybridFilter = 'both';
+      powerFilter = 'both';
+      excludedManufacturers.clear();
+      
+      // Update sliders
+      if (document.getElementById('rangeSlider').noUiSlider) {
+        document.getElementById('rangeSlider').noUiSlider.set(capacityRange);
+      }
+      if (document.getElementById('uefSlider').noUiSlider) {
+        document.getElementById('uefSlider').noUiSlider.set(uefRange);
+      }
+      if (document.getElementById('priceSlider').noUiSlider) {
+        document.getElementById('priceSlider').noUiSlider.set(priceRange);
+      }
+      
+      // Reset toggle buttons
+      document.querySelectorAll('.hybrid-toggle').forEach(btn => btn.classList.remove('active'));
+      document.getElementById('hybridBothBtn').classList.add('active');
+      document.querySelectorAll('#powerFilterWrapper .hybrid-toggle').forEach(btn => btn.classList.remove('active'));
+      document.getElementById('powerBothBtn').classList.add('active');
+      
+      // Reset manufacturer toggles
+      document.querySelectorAll('.manufacturer-toggle').forEach(btn => btn.classList.add('active'));
+      
+      // Remove active state from all filter buttons
+      document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+      
+      // Hide all filter wrappers
+      Object.keys(filters).forEach(f => {
+        document.getElementById(filters[f].wrapper).style.display = 'none';
+      });
+      
+      // Clear selected products
+      selectedProducts.clear();
+      
+      // Re-render table
+      filterAndRender();
+    }
+
+    ['manufacturer', 'capacity', 'uef', 'hybrid', 'power', 'price'].forEach(filter => {
+      document.getElementById(filters[filter].btn).addEventListener('click', () => toggleFilter(filter));
+    });
+
+    // Add clear button event listener
+    document.getElementById('clearBtn').addEventListener('click', clearAllFilters);
+
+    ['Yes', 'No', 'Both'].forEach(type => {
+      document.getElementById(`hybrid${type}Btn`).addEventListener('click', () => setHybridFilter(type.toLowerCase()));
+    });
+
+    ['Plugin', 'Hardwired', 'Both'].forEach(type => {
+      document.getElementById(`power${type}Btn`).addEventListener('click', () => setPowerFilter(type.toLowerCase()));
+    });
+
+    function setHybridFilter(value) {
+      hybridFilter = value;
+      document.querySelectorAll('.hybrid-toggle').forEach(btn => btn.classList.remove('active'));
+      document.getElementById(`hybrid${value.charAt(0).toUpperCase() + value.slice(1)}Btn`).classList.add('active');
+      document.getElementById('hybridBtn').classList.toggle('active', hybridFilter !== 'both');
+      filterAndRender();
+    }
+
+    function setPowerFilter(value) {
+      powerFilter = value;
+      document.querySelectorAll('#powerFilterWrapper .hybrid-toggle').forEach(btn => btn.classList.remove('active'));
+      document.getElementById(`power${value.charAt(0).toUpperCase() + value.slice(1)}Btn`).classList.add('active');
+      document.getElementById('powerBtn').classList.toggle('active', powerFilter !== 'both');
+      filterAndRender();
+    }
+
+    function createManufacturerFilter() {
+      const container = document.getElementById('manufacturerCheckboxes');
+      container.innerHTML = '';
+      
+      allManufacturers.forEach(manufacturer => {
+        const button = document.createElement('button');
+        button.className = 'manufacturer-toggle';
+        button.textContent = manufacturer;
+        button.id = `mfg_${manufacturer.replace(/\s+/g, '_')}`;
+        
+        // Button is active (selected) when manufacturer is NOT excluded
+        const isActive = !excludedManufacturers.has(manufacturer);
+        if (isActive) {
+          button.classList.add('active');
+        }
+        
+        button.addEventListener('click', () => toggleManufacturer(manufacturer));
+        container.appendChild(button);
+      });
+    }
+
+    function toggleManufacturer(manufacturer) {
+      const button = document.getElementById(`mfg_${manufacturer.replace(/\s+/g, '_')}`);
+      
+      if (excludedManufacturers.has(manufacturer)) {
+        // Currently excluded, so include it (make active)
+        excludedManufacturers.delete(manufacturer);
+        button.classList.add('active');
+      } else {
+        // Currently included, so exclude it (make inactive)
+        excludedManufacturers.add(manufacturer);
+        button.classList.remove('active');
+      }
+      
+      // Update main filter button active state
+      const isDefault = excludedManufacturers.size === 0;
+      document.getElementById('manufacturerBtn').classList.toggle('active', !isDefault);
+      
+      filterAndRender();
+    }
+
+    function sortByColumn(columnKey) {
+      const direction = currentSort.column === columnKey && currentSort.direction === 'asc' ? 'desc' : 'asc';
+      currentSort = { column: columnKey, direction };
+      const source = filteredProducts.length ? filteredProducts : products;
+      
+      const sorted = [...source].sort((a, b) => {
+        if (detectedNumericColumns.has(columnKey)) {
+          const [numA, numB] = [extractNumericValue(a[columnKey], columnKey), extractNumericValue(b[columnKey], columnKey)];
+          if (isNaN(numA) && isNaN(numB)) return 0;
+          if (isNaN(numA)) return 1;
+          if (isNaN(numB)) return -1;
+          return direction === 'asc' ? numA - numB : numB - numA;
+        } else {
+          const [valA, valB] = [(a[columnKey] || '').toString().toLowerCase(), (b[columnKey] || '').toString().toLowerCase()];
+          return direction === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
+        }
+      });
+      
+      setTimeout(() => {
+        const indicator = document.querySelector(`th[data-column="${columnKey}"] .sort-indicator`);
+        if (indicator) {
+          indicator.classList.remove('flip-in');
+          indicator.offsetHeight;
+          indicator.classList.add('flip-in');
+        }
+      }, 50);
+      
+      renderTable(sorted);
+    }
+
+    function hideColumnsByHeader(headersToHide) {
+      const headers = document.querySelectorAll('#productTable thead th');
+      const indexesToHide = [];
+      headers.forEach((th, i) => {
+        if (headersToHide.map(h => h.toLowerCase()).includes(th.textContent.trim().toLowerCase())) {
+          indexesToHide.push(i);
+        }
+      });
+      document.querySelectorAll('#productTable tr').forEach(row => {
+        indexesToHide.forEach(index => {
+          if (row.children[index]) row.children[index].style.display = 'none';
+        });
+      });
+    }
+
+    function renderTable(data) {
+      document.getElementById('resultCount').textContent = `${data.length} result${data.length !== 1 ? 's' : ''}`;
+      const [thead, tbody] = [document.querySelector('#productTable thead'), document.querySelector('#productTable tbody')];
+      thead.innerHTML = '';
+      tbody.innerHTML = '';
+      
+      if (!data.length) {
+        tbody.innerHTML = '<tr><td colspan="100%" class="no-results">No products match your current filter criteria</td></tr>';
+        return;
+      }
+
+      const headerRow = document.createElement('tr');
+      Object.keys(data[0]).forEach(key => {
+        if (key === '_id') return;
+        const th = document.createElement('th');
+        const headerMappings = {
+          'Make': { text: 'Brand' },
+          'Capacity (GAL)': { text: 'Capacity', unit: 'Gallons' },
+          'FHR': { text: 'FHR', unit: 'First Hour Rating (Gallons)'},
+          'Diameter': { text: 'Diameter', unit: 'Inches' },
+          'Height': { text: 'Height', unit: 'Inches' },
+          'Noise': { text: 'Noise', unit: 'dBA' },
+          'UEF': { text: 'UEF', unit: 'Uniform Energy Factor' }
+        };
+        
+        const mapping = headerMappings[key] || { text: key };
+        th.textContent = mapping.text;
+        th.setAttribute('data-column', key);
+        
+        if (mapping.unit) {
+          th.classList.add('unit-tooltip');
+          th.setAttribute('data-unit', mapping.unit);
+        }
+        
+        th.addEventListener('click', () => sortByColumn(key));
+        if (key === currentSort.column) {
+          const indicator = document.createElement('span');
+          indicator.className = 'sort-indicator flip-in';
+          indicator.textContent = currentSort.direction === 'asc' ? '▲' : '▼';
+          th.appendChild(indicator);
+        }
+        headerRow.appendChild(th);
+      });
+      thead.appendChild(headerRow);
+      
+      data.forEach(prod => {
+        const tr = document.createElement('tr');
+        tr.setAttribute('data-product-id', prod._id);
+        if (selectedProducts.has(prod._id)) tr.classList.add('selected');
+        tr.addEventListener('click', (e) => {
+          e.preventDefault();
+          if (selectedProducts.has(prod._id)) {
+            selectedProducts.delete(prod._id);
+            tr.classList.remove('selected');
+          } else {
+            selectedProducts.add(prod._id);
+            tr.classList.add('selected');
+          }
+        });
+        
+        Object.entries(prod).forEach(([key, val]) => {
+          if (key === '_id') return;
+          const td = document.createElement('td');
+          const keyUpper = key.toUpperCase();
+
+ if (keyUpper === 'COST' && /^https?:\/\//.test(val)) {
+            const a = document.createElement('a');
+            a.href = val;
+            a.target = '_blank';
+            a.rel = 'noopener noreferrer';
+            a.textContent = 'Link';
+            a.addEventListener('click', (e) => e.stopPropagation());
+            td.appendChild(a);
+          } else if (keyUpper === 'PRICE' && prod['COST'] && /^https?:\/\//.test(prod['COST'])) {
+            const a = document.createElement('a');
+            a.href = prod['COST'];
+            a.target = '_blank';
+            a.rel = 'noopener noreferrer';
+            a.textContent = val;
+            a.className = 'model-link';
+            a.addEventListener('click', (e) => e.stopPropagation());
+            td.appendChild(a);
+          } else if (keyUpper === 'MODEL' && prod['Spec'] && /^https?:\/\//.test(prod['Spec'])) {
+            const a = document.createElement('a');
+            a.href = prod['Spec'];
+            a.target = '_blank';
+            a.rel = 'noopener noreferrer';
+            a.textContent = val;
+            a.className = 'model-link';
+            a.addEventListener('click', (e) => e.stopPropagation());
+            td.appendChild(a);
+            td.classList.add('left-align');
+          } else {
+            td.textContent = val;
+            if (!isNaN(val) && val.trim() !== '') td.classList.add('numeric-cell');
+            if (val.trim().toLowerCase() === '-') td.classList.add('unavailable-cell');
+            if (keyUpper === 'MAKE' || keyUpper === 'MODEL') td.classList.add('left-align');
+          }
+          tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+      });
+
+      hideColumnsByHeader(columnsToHide);
+    }
+
+    function filterAndRender() {
+      const activeFilters = Object.keys(filters).map(f => ({ name: f, active: document.getElementById(filters[f].btn).classList.contains('active') }));
+      
+      // Update clear button active state based on any filters being active
+      const hasActiveFilters = activeFilters.some(f => f.active);
+      document.getElementById('clearBtn').classList.toggle('active', hasActiveFilters);
+      
+      if (!hasActiveFilters) {
+        renderTable(products);
+        return;
+      }
+      const filtered = products.filter(p => {
+        if (selectedProducts.has(p._id)) return true;
+        
+        const checks = {
+          manufacturer: () => {
+            if (excludedManufacturers.size === 0) return true;
+            const manufacturer = p['Manufacturer'] || '';
+            return !excludedManufacturers.has(manufacturer);
+          },
+          capacity: () => {
+            const cap = parseFloat(p['Capacity (GAL)']?.replace(/[^\d.]/g, ''));
+            return isFinite(cap) && cap >= capacityRange[0] && cap <= capacityRange[1];
+          },
+          uef: () => {
+            const uef = parseFloat(p['UEF']?.replace(/[^\d.]/g, ''));
+            return isFinite(uef) && uef >= uefRange[0] && uef <= uefRange[1];
+          },
+          price: () => {
+            const priceStr = p['Price'];
+            if (!priceStr || priceStr.toLowerCase() === '-' || priceStr.trim() === '') return false;
+            const price = parseFloat(priceStr.replace(/\$|,/g, ''));
+            return !isNaN(price) && isFinite(price) && price >= priceRange[0] && price <= priceRange[1];
+          },
+          hybrid: () => {
+            const hybridValue = p['Hybrid']?.toLowerCase().trim();
+            return hybridFilter === 'both' || hybridValue === hybridFilter;
+          },
+          power: () => {
+            const circuitValue = p['Circuit']?.toLowerCase().trim();
+            if (powerFilter === 'both') return true;
+            if (powerFilter === 'plugin') {
+              return circuitValue === 'shared' || circuitValue === 'dedicated' || 
+                     circuitValue === 'plug-in' || circuitValue === 'plug in' || circuitValue === 'plugin';
+            } else if (powerFilter === 'hardwired') {
+              return circuitValue === 'hardwired' || circuitValue === 'hard-wired' || circuitValue === 'hard wired';
+            }
+            return false;
+          }
+        };
+
+        return activeFilters.every(filter => !filter.active || checks[filter.name]());
+      });
+
+      filteredProducts = filtered;
+      renderTable(filteredProducts);
+    }
+
+    function createSlider(id, range, actual, format, updateFn) {
+      const slider = document.getElementById(id);
+      noUiSlider.create(slider, {
+        start: range,
+        connect: true,
+        range: { min: actual[0], max: actual[1] },
+        step: id.includes('uef') ? 0.01 : (id.includes('price') ? 10 : 1),
+        format: format
+      });
+      slider.noUiSlider.on('update', updateFn);
+    }
+
+    const formatPrice = num => '$' + Math.round(num).toLocaleString();
+
+    fetch(apiUrl)
+      .then(res => res.json())
+      .then(data => {
+        products = parseSheetData(data);
+        
+        // Extract unique manufacturers
+        const manufacturerSet = new Set();
+        products.forEach(product => {
+          const manufacturer = product['Manufacturer'] || '';
+          if (manufacturer && manufacturer.trim() !== '') {
+            manufacturerSet.add(manufacturer.trim());
+          }
+        });
+        allManufacturers = Array.from(manufacturerSet).sort();
+        
+        if (products.length > 0) {
+          Object.keys(products[0]).forEach(columnKey => detectNumericColumn(columnKey, products));
+        }
+        
+        products.sort((a, b) => a['MODEL']?.localeCompare(b['MODEL']));
+        currentSort = { column: 'MODEL', direction: 'asc' };
+
+        actualUefRange = getRange(products, 'UEF');
+        actualCapacityRange = getRange(products, 'Capacity (GAL)');
+        actualPriceRange = getPriceRange(products);
+        
+        [capacityRange, uefRange, priceRange] = [[...actualCapacityRange], [...actualUefRange], [...actualPriceRange]];
+
+        renderTable(products);
+
+        // Create manufacturer filter
+        createManufacturerFilter();
+
+        createSlider('rangeSlider', capacityRange, actualCapacityRange, 
+          { to: value => Math.round(value), from: value => Number(value) },
+          (values) => {
+            capacityRange = values.map(parseFloat);
+            document.getElementById('sliderValue').textContent = `${capacityRange[0]} – ${capacityRange[1]} gallons`;
+            const isDefault = capacityRange[0] === actualCapacityRange[0] && capacityRange[1] === actualCapacityRange[1];
+            document.getElementById('capacityBtn').classList.toggle('active', !isDefault);
+            filterAndRender();
+          });
+
+        createSlider('uefSlider', uefRange, actualUefRange,
+          { to: val => parseFloat(val).toFixed(2), from: val => parseFloat(val) },
+          (values) => {
+            uefRange = values.map(parseFloat);
+            document.getElementById('uefSliderValue').textContent = `${uefRange[0].toFixed(2)} – ${uefRange[1].toFixed(2)} UEF`;
+            const isDefault = uefRange[0] === actualUefRange[0] && uefRange[1] === actualUefRange[1];
+            document.getElementById('uefBtn').classList.toggle('active', !isDefault);
+            filterAndRender();
+          });
+
+        document.getElementById('uefSliderValue').textContent = `${actualUefRange[0].toFixed(2)} – ${actualUefRange[1].toFixed(2)} UEF`;
+
+        createSlider('priceSlider', priceRange, actualPriceRange,
+          { to: value => Math.round(value), from: value => Number(value) },
+          (values) => {
+            priceRange = values.map(parseFloat);
+            document.getElementById('priceSliderValue').textContent = `${formatPrice(priceRange[0])} – ${formatPrice(priceRange[1])}`;
+            const isDefault = Math.abs(priceRange[0] - actualPriceRange[0]) < 15 && Math.abs(priceRange[1] - actualPriceRange[1]) < 15;
+            document.getElementById('priceBtn').classList.toggle('active', !isDefault);
+            filterAndRender();
+          });
+
+        document.getElementById('priceSliderValue').textContent = `${formatPrice(actualPriceRange[0])} – ${formatPrice(actualPriceRange[1])}`;
+      })
+      .catch(err => {
+        console.error('Error loading data:', err);
+        document.querySelector('#productTable tbody').innerHTML = '<tr><td colspan="100%">Failed to load data</td></tr>';
+      });
+  </script>
+</body>
+</html>
